@@ -1,7 +1,7 @@
 #import "CCLHTTPServerResponse.h"
 
 static NSString * CCLHTTPPercentEscapedQueryString(NSString *string) {
-    return (__bridge_transfer  NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (__bridge CFStringRef)string, (__bridge CFStringRef)@"[].", (__bridge CFStringRef)@":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
+    return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@":/?&=;+!@#$()',*"]];
 }
 
 @implementation CCLHTTPServerResponse
@@ -75,8 +75,8 @@ static NSString * CCLHTTPPercentEscapedQueryString(NSString *string) {
 }
 
 + (instancetype)propertyListResponseWithStatusCode:(NSUInteger)statusCode headers:(NSDictionary *)headers plist:(id)plist {
-    NSString *error;
-    NSData *body = [NSPropertyListSerialization dataFromPropertyList:plist format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
+    NSError *error;
+    NSData *body = [NSPropertyListSerialization dataWithPropertyList:plist format:NSPropertyListXMLFormat_v1_0 options:NSPropertyListMutableContainersAndLeaves error:&error];
 
     if (headers == nil) {
         headers = @{
